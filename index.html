@@ -5,99 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة قلب الكروت وإيجاد الفواكه</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            text-align: center;
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            background: linear-gradient(135deg, #c3e6cb, #9ec5fe);
+            min-height: 100vh;
+            text-align: center;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
         }
         
         h1 {
-            color: #4CAF50;
+            color: #2b5876;
             margin-bottom: 20px;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+            font-size: 2rem;
         }
         
         .game-container {
-            max-width: 600px;
-            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
         }
         
         .game-info {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px 15px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            color: #2b5876;
+        }
+        
+        .game-info-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .game-info-item span {
+            margin-right: 5px;
+            background-color: #2b5876;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .game-board {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 20px;
         }
         
         .card {
-            aspect-ratio: 3/4;
-            background-color: #2196F3;
-            border-radius: 8px;
+            position: relative;
+            height: 80px;
+            width: 100%;
+            perspective: 1000px;
             cursor: pointer;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            transition: transform 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 8px;
         }
         
-        .card.flipped {
+        .card-front {
+            background: linear-gradient(45deg, #2b5876, #4e4376);
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-back {
+            background-color: #ffffff;
             transform: rotateY(180deg);
-            background-color: #fff;
+            font-size: 28px;
         }
         
-        .card.matched {
-            background-color: #8BC34A;
-            cursor: default;
+        .card.matched .card-back {
+            background: linear-gradient(45deg, #56ab2f, #a8e063);
+            animation: pulse 1s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1) rotateY(180deg); }
+            50% { transform: scale(1.1) rotateY(180deg); }
+            100% { transform: scale(1) rotateY(180deg); }
+        }
+        
+        .preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            color: white;
+            flex-direction: column;
+        }
+        
+        .preview-text {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .preview-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .preview-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-width: 500px;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .preview-card {
+            background-color: white;
+            border-radius: 8px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
         }
         
         button {
-            background-color: #4CAF50;
+            background: linear-gradient(45deg, #2b5876, #4e4376);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 16px;
-            border-radius: 5px;
+            border-radius: 30px;
             cursor: pointer;
             margin-top: 10px;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-family: 'Tajawal', Arial, sans-serif;
+            font-weight: bold;
         }
         
         button:hover {
-            background-color: #388E3C;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            top: -10px;
+            z-index: 90;
+            animation: fall linear forwards;
+        }
+        
+        @keyframes fall {
+            to {
+                top: 100vh;
+                transform: rotate(360deg);
+            }
+        }
+        
+        .timer-container {
+            margin-top: 10px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 5px;
+            position: relative;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .timer-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(to right, #56ab2f, #a8e063);
+            width: 100%;
+            border-radius: 20px;
+            transition: width 1s linear;
         }
         
         @media (max-width: 500px) {
             .game-board {
                 grid-template-columns: repeat(3, 1fr);
             }
+            
+            .preview-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .card, .preview-card {
+                height: 70px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>لعبة قلب الكروت وإيجاد الفواكه</h1>
-    
-    <div class="game-container">
-        <div class="game-info">
-            <div>المحاولات: <span id="moves">0</span></div>
-            <div>الأزواج: <span id="pairs">0</span> / 6</div>
+    <div class="container">
+        <h1>لعبة قلب الكروت وإيجاد الفواكه</h1>
+        
+        <div class="game-container">
+            <div class="game-info">
+                <div class="game-info-item">المحاولات: <span id="moves">0</span></div>
+                <div class="game-info-item">الأزواج: <span id="pairs">0</span> / 6</div>
+            </div>
+            
+            <div class="game-board" id="game-board"></div>
+            
+            <button id="restart-btn">إعادة اللعب</button>
         </div>
-        
-        <div class="game-board" id="game-board"></div>
-        
-        <button id="restart-btn">إعادة اللعب</button>
     </div>
 
     <script>
@@ -111,7 +289,8 @@
             let moves = 0;
             let pairs = 0;
             let flippedCards = [];
-            let canFlip = true;
+            let canFlip = false; // منع قلب البطاقات في البداية حتى تنتهي المعاينة
+            let shuffledFruits = []; // تخزين الفواكه المخلوطة حتى يمكن استخدامها في المعاينة وفي اللعبة
             
             const gameBoard = document.getElementById('game-board');
             const movesCounter = document.getElementById('moves');
@@ -120,19 +299,36 @@
             
             // مزج الفواكه عشوائياً
             function shuffleFruits() {
-                return allFruits.sort(() => Math.random() - 0.5);
+                return [...allFruits].sort(() => Math.random() - 0.5);
             }
             
             // إنشاء بطاقات اللعبة
             function createCards() {
                 gameBoard.innerHTML = '';
-                const shuffledFruits = shuffleFruits();
+                // إنشاء الترتيب العشوائي مرة واحدة فقط واستخدامه في كل من المعاينة واللعبة
+                shuffledFruits = shuffleFruits();
                 
                 shuffledFruits.forEach((fruit, index) => {
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.dataset.fruit = fruit;
                     card.dataset.index = index;
+                    
+                    // إنشاء هيكل البطاقة الداخلي
+                    const cardInner = document.createElement('div');
+                    cardInner.className = 'card-inner';
+                    
+                    const cardFront = document.createElement('div');
+                    cardFront.className = 'card-front';
+                    cardFront.textContent = '?';
+                    
+                    const cardBack = document.createElement('div');
+                    cardBack.className = 'card-back';
+                    cardBack.textContent = fruit;
+                    
+                    cardInner.appendChild(cardFront);
+                    cardInner.appendChild(cardBack);
+                    card.appendChild(cardInner);
                     
                     card.addEventListener('click', flipCard);
                     gameBoard.appendChild(card);
@@ -146,8 +342,6 @@
                 }
                 
                 this.classList.add('flipped');
-                this.innerHTML = this.dataset.fruit;
-                
                 flippedCards.push(this);
                 
                 if (flippedCards.length === 2) {
@@ -155,7 +349,7 @@
                     movesCounter.textContent = moves;
                     canFlip = false;
                     
-                    setTimeout(checkMatch, 500);
+                    setTimeout(checkMatch, 700);
                 }
             }
             
@@ -171,18 +365,106 @@
                     
                     if (pairs === fruits.length) {
                         setTimeout(() => {
-                            alert(`مبروك! لقد فزت بعد ${moves} محاولات`);
+                            celebrateWin();
                         }, 300);
                     }
                 } else {
                     card1.classList.remove('flipped');
                     card2.classList.remove('flipped');
-                    card1.innerHTML = '';
-                    card2.innerHTML = '';
                 }
                 
                 flippedCards = [];
                 canFlip = true;
+            }
+            
+            // معاينة البطاقات لمدة 5 ثوانٍ بنفس الترتيب الموجود في اللعبة
+            function previewCards() {
+                const overlay = document.createElement('div');
+                overlay.className = 'preview-overlay';
+                
+                const previewText = document.createElement('div');
+                previewText.className = 'preview-text';
+                previewText.textContent = 'شاهد الفواكه وتذكر أماكنها!';
+                
+                const previewTimer = document.createElement('div');
+                previewTimer.className = 'preview-timer';
+                previewTimer.textContent = '5';
+                
+                const previewBoard = document.createElement('div');
+                previewBoard.className = 'preview-board';
+                
+                const timerContainer = document.createElement('div');
+                timerContainer.className = 'timer-container';
+                
+                const timerBar = document.createElement('div');
+                timerBar.className = 'timer-bar';
+                
+                timerContainer.appendChild(timerBar);
+                
+                overlay.appendChild(previewText);
+                overlay.appendChild(previewTimer);
+                overlay.appendChild(previewBoard);
+                overlay.appendChild(timerContainer);
+                
+                document.body.appendChild(overlay);
+                
+                // إنشاء نسخة من البطاقات للمعاينة تستخدم نفس ترتيب الفواكه في اللعبة
+                shuffledFruits.forEach((fruit, index) => {
+                    const previewCard = document.createElement('div');
+                    previewCard.className = 'preview-card';
+                    previewCard.textContent = fruit;
+                    previewCard.dataset.index = index; // للتأكد من المطابقة مع البطاقات الفعلية
+                    previewBoard.appendChild(previewCard);
+                });
+                
+                // العد التنازلي
+                let timeLeft = 5;
+                
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    previewTimer.textContent = timeLeft;
+                    timerBar.style.width = `${(timeLeft / 5) * 100}%`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        document.body.removeChild(overlay);
+                        canFlip = true; // السماح بقلب البطاقات بعد انتهاء المعاينة
+                    }
+                }, 1000);
+            }
+            
+            // احتفال الفوز
+            function celebrateWin() {
+                // إضافة كونفيتي
+                for (let i = 0; i < 100; i++) {
+                    createConfetti();
+                }
+                
+                setTimeout(() => {
+                    alert(`مبروك! لقد فزت بعد ${moves} محاولات`);
+                }, 500);
+            }
+            
+            // إنشاء كونفيتي
+            function createConfetti() {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                
+                document.body.appendChild(confetti);
+                
+                // إزالة الكونفيتي بعد انتهاء الحركة
+                setTimeout(() => {
+                    document.body.removeChild(confetti);
+                }, 5000);
+            }
+            
+            // لون عشوائي للكونفيتي
+            function getRandomColor() {
+                const colors = ['#ff4747', '#47ff47', '#4747ff', '#ffff47', '#ff47ff', '#47ffff'];
+                return colors[Math.floor(Math.random() * colors.length)];
             }
             
             // إعادة تشغيل اللعبة
@@ -190,12 +472,13 @@
                 moves = 0;
                 pairs = 0;
                 flippedCards = [];
-                canFlip = true;
+                canFlip = false;
                 
                 movesCounter.textContent = moves;
                 pairsCounter.textContent = pairs;
                 
                 createCards();
+                previewCards();
             }
             
             // بدء اللعبة
